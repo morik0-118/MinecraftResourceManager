@@ -274,8 +274,9 @@
 
                         <!-- リソパ共有 -->
 
-                        <DataGridTemplateColumn Header="リソースパック"
-                                        Width="80">
+                        <DataGridTemplateColumn x:Name="ResourcePackShareColumn"
+                                                Header="リソースパック"
+                                                Width="80">
 
                             <DataGridTemplateColumn.CellTemplate>
 
@@ -294,11 +295,32 @@
 
                         </DataGridTemplateColumn>
 
+                        <!-- リソパ状態 -->
 
+                        <DataGridTemplateColumn x:Name="ResourcePackStatusColumn"
+                                                Header="リソース状態"
+                                                Width="80">
+
+                            <DataGridTemplateColumn.CellTemplate>
+
+                                <DataTemplate>
+
+                                    <TextBlock
+                                Text="{Binding ResourcePackStatus}"
+                                Style="{StaticResource PackStatusStyle}"/>
+
+                                </DataTemplate>
+
+                            </DataGridTemplateColumn.CellTemplate>
+
+                        </DataGridTemplateColumn>
+
+                        
                         <!-- シェーダー共有 -->
 
-                        <DataGridTemplateColumn Header="シェーダーパック"
-                                        Width="80">
+                        <DataGridTemplateColumn x:Name="ShaderPackShareColumn"
+                                                Header="シェーダーパック"
+                                                Width="80">
 
                             <DataGridTemplateColumn.CellTemplate>
 
@@ -317,31 +339,11 @@
 
                         </DataGridTemplateColumn>
 
-
-                        <!-- リソパ状態 -->
-
-                        <DataGridTemplateColumn Header="リソース状態"
-                                        Width="80">
-
-                            <DataGridTemplateColumn.CellTemplate>
-
-                                <DataTemplate>
-
-                                    <TextBlock
-                                Text="{Binding ResourcePackStatus}"
-                                Style="{StaticResource PackStatusStyle}"/>
-
-                                </DataTemplate>
-
-                            </DataGridTemplateColumn.CellTemplate>
-
-                        </DataGridTemplateColumn>
-
-
                         <!-- シェーダー状態 -->
 
-                        <DataGridTemplateColumn Header="シェーダー状態"
-                                        Width="80">
+                        <DataGridTemplateColumn x:Name="ShaderPackStatusColumn"
+                                                Header="シェーダー状態"
+                                                Width="80">
 
                             <DataGridTemplateColumn.CellTemplate>
 

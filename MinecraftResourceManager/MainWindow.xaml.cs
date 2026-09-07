@@ -74,6 +74,8 @@ namespace MinecraftResourceManager
             ResourcePackPath.Text =
                 dialog.FolderName;
 
+            UpdatePackColumnVisibility();
+
             SaveSettings();
         }
 
@@ -111,8 +113,46 @@ namespace MinecraftResourceManager
             ShaderPackPath.Text =
                 dialog.FolderName;
 
+            UpdatePackColumnVisibility();
+
             SaveSettings();
         }
+
+        // ==========================================
+        // 共有インスタンス表示
+        // ==========================================
+        private void UpdatePackColumnVisibility()
+        {
+            bool resourcePackConfigured =
+                !string.IsNullOrWhiteSpace(ResourcePackPath.Text);
+
+            bool shaderPackConfigured =
+                !string.IsNullOrWhiteSpace(ShaderPackPath.Text);
+
+            ResourcePackShareColumn.Visibility =
+                resourcePackConfigured
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+
+            ResourcePackStatusColumn.Visibility =
+                resourcePackConfigured
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+
+            ShaderPackShareColumn.Visibility =
+                shaderPackConfigured
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+
+            ShaderPackStatusColumn.Visibility =
+                shaderPackConfigured
+                    ? Visibility.Visible
+                    : Visibility.Collapsed;
+        }
+
+        // ==========================================
+        // インスタンス検出
+        // ==========================================
 
         private async void DetectInstances_Click(object sender, RoutedEventArgs e)
         {
@@ -164,7 +204,7 @@ namespace MinecraftResourceManager
                             StringComparison.OrdinalIgnoreCase)))
                     .Select(path => new InstanceCandidate
                     {
-                        IsSelected = true,
+                        IsSelected = false,
                         Name = new DirectoryInfo(path).Name,
                         Path = path
                     })
@@ -207,15 +247,15 @@ namespace MinecraftResourceManager
                         Name = candidate.Name,
                         Path = candidate.Path,
 
-                        ShareResourcePacks = true,
-                        ShareShaderPacks = true,
+                        ShareResourcePacks = false,
+                        ShareShaderPacks = false,
 
-                        AppliedShareResourcePacks = true,
-                        AppliedShareShaderPacks = true,
+                        AppliedShareResourcePacks = false,
+                        AppliedShareShaderPacks = false,
 
-                        ResourcePackStatus = "未適用",
-                        ShaderPackStatus = "未適用",
-                        Status = "未適用"
+                        ResourcePackStatus = "未共有",
+                        ShaderPackStatus = "未共有",
+                        Status = "適用済み"
                     });
 
                     addedCount++;
@@ -335,11 +375,13 @@ namespace MinecraftResourceManager
             {
                 Name = instanceName,
                 Path = selectedPath,
-                AppliedShareResourcePacks = true,
-                AppliedShareShaderPacks = true,
-                ShareResourcePacks = true,
-                ShareShaderPacks = true,
-                Status = "未適用"
+                AppliedShareResourcePacks = false,
+                AppliedShareShaderPacks = false,
+                ShareResourcePacks = false,
+                ShareShaderPacks = false,
+                ResourcePackStatus = "未共有",
+                ShaderPackStatus = "未共有",
+                Status = "適用済み"
             };
 
             Instances.Add(newInstance);
@@ -370,6 +412,7 @@ namespace MinecraftResourceManager
 
             var result = MessageBox.Show(
                 $"「{selected.Name}」を一覧から削除しますか？\n\n" +
+                "共有中の場合は、共有を解除してから一覧から削除します。\n" +
                 "※Minecraftフォルダ自体は削除されません。",
                 "インスタンス削除",
                 MessageBoxButton.YesNo,
@@ -380,12 +423,53 @@ namespace MinecraftResourceManager
                 return;
             }
 
-            Instances.Remove(selected);
+            try
+            {
+                // Resource Packs の共有を解除
+                if (IsReparsePoint(
+                    Path.Combine(selected.Path, "resourcepacks")))
+                {
+                    RemoveFolderLink(
+                        selected.Path,
+                        "resourcepacks");
+                }
 
-            StatusText.Text =
-                $"「{selected.Name}」を一覧から削除しました。";
+                // Shader Packs の共有を解除
+                if (IsReparsePoint(
+                    Path.Combine(selected.Path, "shaderpacks")))
+                {
+                    RemoveFolderLink(
+                        selected.Path,
+                        "shaderpacks");
+                }
 
-            SaveSettings();
+                // 共有解除後に一覧から削除
+                Instances.Remove(selected);
+
+                StatusText.Text =
+                    $"「{selected.Name}」の共有を解除して一覧から削除しました。";
+
+                SaveSettings();
+
+                MessageBox.Show(
+                    $"「{selected.Name}」の共有を解除して一覧から削除しました。",
+                    "インスタンス削除",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"「{selected.Name}」の共有解除中にエラーが発生しました。\n\n" +
+                    $"{ex.Message}\n\n" +
+                    "インスタンスは一覧から削除していません。",
+                    "インスタンス削除エラー",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Error);
+
+                StatusText.Text =
+                    $"「{selected.Name}」の削除に失敗しました。";
+            }
         }
 
         private void InstanceList_PreviewMouseLeftButtonDown(
@@ -617,7 +701,7 @@ namespace MinecraftResourceManager
             }
             else
             {
-                instance.ResourcePackStatus = "なし";
+                instance.ResourcePackStatus = "未共有";
             }
 
             // Shader Packs
@@ -631,7 +715,7 @@ namespace MinecraftResourceManager
             }
             else
             {
-                instance.ShaderPackStatus = "なし";
+                instance.ShaderPackStatus = "未共有";
             }
         }
 
@@ -969,6 +1053,8 @@ namespace MinecraftResourceManager
 
                 ShaderPackPath.Text =
                     settings.ShaderPackPath ?? "";
+
+                UpdatePackColumnVisibility();
 
                 Instances.Clear();
 

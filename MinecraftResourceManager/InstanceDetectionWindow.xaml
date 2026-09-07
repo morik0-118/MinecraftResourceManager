@@ -7,7 +7,26 @@
         MinWidth="700"
         MinHeight="400"
         WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <!-- ハイライト -->
+        <Style TargetType="DataGridRow">
+            <Setter Property="Background" Value="Transparent"/>
 
+            <Style.Triggers>
+
+                <!-- 共有設定が変更され、まだ適用されていない -->
+                <DataTrigger Binding="{Binding IsSharingChanged}"
+             Value="True">
+
+                    <Setter Property="Background"
+            Value="#FFF4CC"/>
+
+                </DataTrigger>
+
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+    
     <Grid Margin="20">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,6 +48,18 @@
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
                   SelectionMode="Single">
+
+            <DataGrid.Resources>
+
+                <!-- 選択中の背景色 -->
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}"
+                     Color="#80A0A0A0"/>
+
+                <!-- 選択中の文字色 -->
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}"
+                     Color="Black"/>
+
+            </DataGrid.Resources>
 
             <DataGrid.Columns>
 
