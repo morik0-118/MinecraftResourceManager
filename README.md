@@ -21,6 +21,5 @@ Minecraftの複数インスタンス間で、Resource PacksとShader Packsを共
 - Shader Packsの共有
 - Minecraftインスタンスごとに共有設定を変更
 - Minecraftインスタンスを自動検出
-- フォルダ単位のシンボリックリンクを使用
 - 共有解除時に元のフォルダをバックアップ・復元
 - 設定を自動保存
