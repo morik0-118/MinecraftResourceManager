@@ -15,11 +15,12 @@
             <Style.Triggers>
 
                 <!-- 共有設定が変更され、まだ適用されていない -->
-                <DataTrigger Binding="{Binding IsSharingChanged}"
-             Value="True">
+                <!-- 「追加」がONの行を薄くハイライト -->
+                <DataTrigger Binding="{Binding IsSelected}"
+                     Value="True">
 
                     <Setter Property="Background"
-            Value="#FFF4CC"/>
+                    Value="#FFF4CC"/>
 
                 </DataTrigger>
 
@@ -47,7 +48,8 @@
                   ItemsSource="{Binding Candidates}"
                   AutoGenerateColumns="False"
                   CanUserAddRows="False"
-                  SelectionMode="Single">
+                  SelectionMode="Single"
+                  HeadersVisibility="Column">
 
             <DataGrid.Resources>
 
